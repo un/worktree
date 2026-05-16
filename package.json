@@ -5,7 +5,7 @@
   "main": "dist/cli.js",
   "type": "module",
   "bin": {
-    "worktree": "./bin/worktree.js"
+    "worktree": "bin/worktree.js"
   },
   "scripts": {
     "build": "tsc",
