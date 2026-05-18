@@ -2,7 +2,7 @@
 
 > **Transform your Git workflow with blazing-fast worktree management across multiple repositories** ⚡
 
-[![npm version](https://img.shields.io/npm/v/worktree-cli.svg)](https://www.npmjs.com/package/worktree-cli)
+[![npm version](https://img.shields.io/npm/v/@mcadam/worktree.svg)](https://www.npmjs.com/package/@mcadam/worktree)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue.svg)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
@@ -47,13 +47,13 @@ Select multiple worktrees with spacebar and delete them all at once. Spring clea
 
 ```bash
 # npm
-npm install -g worktree-cli
+npm install -g @mcadam/worktree
 
 # pnpm (recommended)
-pnpm add -g worktree-cli
+pnpm add -g @mcadam/worktree
 
 # yarn
-yarn global add worktree-cli
+yarn global add @mcadam/worktree
 ```
 
 ## 🚀 Quick Start
@@ -241,8 +241,8 @@ Want to contribute? Awesome! Here's how to get started:
 
 ```bash
 # Clone the repo
-git clone https://github.com/yourusername/worktree-cli.git
-cd worktree-cli
+git clone https://github.com/un/worktree.git
+cd worktree
 
 # Install dependencies
 pnpm install
@@ -302,7 +302,7 @@ MIT © [Your Name]
 
 **Built with 💙 by developers, for developers**
 
-[Report Bug](https://github.com/yourusername/worktree-cli/issues) · [Request Feature](https://github.com/yourusername/worktree-cli/issues) · [Star on GitHub](https://github.com/yourusername/worktree-cli)
+[Report Bug](https://github.com/un/worktree/issues) · [Request Feature](https://github.com/un/worktree/issues) · [Star on GitHub](https://github.com/un/worktree)
 
 </div>
 
