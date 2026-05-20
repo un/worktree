@@ -6,7 +6,7 @@ settings:
 
 dependencies:
   chalk:
-    specifier: ^5.3.0
+    specifier: ^5.6.0
     version: 5.6.0
   commander:
     specifier: ^11.1.0
@@ -15,7 +15,7 @@ dependencies:
     specifier: ^8.0.1
     version: 8.0.1
   fs-extra:
-    specifier: ^11.2.0
+    specifier: ^11.3.1
     version: 11.3.1
   ink:
     specifier: ^5.2.1
@@ -33,30 +33,30 @@ dependencies:
     specifier: ^7.0.1
     version: 7.0.1
   react:
-    specifier: ^18.2.0
+    specifier: ^18.3.1
     version: 18.3.1
   zod:
-    specifier: ^3.22.4
+    specifier: ^3.25.76
     version: 3.25.76
 
 devDependencies:
   '@biomejs/biome':
-    specifier: ^1.5.0
+    specifier: ^1.9.4
     version: 1.9.4
   '@types/fs-extra':
     specifier: ^11.0.4
     version: 11.0.4
   '@types/node':
-    specifier: ^20.10.5
+    specifier: ^20.19.11
     version: 20.19.11
   '@types/react':
-    specifier: ^18.2.45
+    specifier: ^18.3.24
     version: 18.3.24
   tsx:
-    specifier: ^4.7.0
+    specifier: ^4.20.5
     version: 4.20.5
   typescript:
-    specifier: ^5.3.3
+    specifier: ^5.9.2
     version: 5.9.2
 
 packages:
@@ -727,7 +727,7 @@ packages:
       type-fest: 4.41.0
       widest-line: 5.0.0
       wrap-ansi: 9.0.0
-      ws: 8.18.3
+      ws: 8.20.1
       yoga-layout: 3.2.1
     transitivePeerDependencies:
       - bufferutil
@@ -1068,8 +1068,8 @@ packages:
       strip-ansi: 7.1.0
     dev: false
 
-  /ws@8.18.3:
-    resolution: {integrity: sha512-PEIGCY5tSlUt50cqyMXfCzX+oOPqN0vuGqWzbcJ2xvnkzkq46oOpz7dQaTDBdfICb4N14+GARUDw2XV2N4tvzg==}
+  /ws@8.20.1:
+    resolution: {integrity: sha512-It4dO0K5v//JtTXuPkfEOaI3uUN87iYPnqo/ZzqCoG3g8uhA66QUMs/SrM0YK7/NAu+r4LMh/9dq2A7k+rHs+w==}
     engines: {node: '>=10.0.0'}
     peerDependencies:
       bufferutil: ^4.0.1
