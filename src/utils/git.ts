@@ -1,5 +1,5 @@
+import path from 'node:path'
 import { execa } from 'execa'
-import path from 'path'
 
 export interface Worktree {
   path: string
@@ -9,6 +9,8 @@ export interface Worktree {
   isPushed?: boolean
   hasPR?: boolean
   prNumber?: number
+  prState?: string
+  isPRMerged?: boolean
 }
 
 export async function createWorktree(
@@ -18,7 +20,7 @@ export async function createWorktree(
   gitRoot: string,
 ): Promise<void> {
   const worktreePath = path.join(basePath, worktreeName)
-  
+
   // Check if branch exists
   try {
     await execa('git', ['rev-parse', '--verify', branchName], { cwd: gitRoot })
@@ -26,7 +28,9 @@ export async function createWorktree(
     // Branch doesn't exist locally, check remote
     try {
       await execa('git', ['fetch', 'origin', branchName], { cwd: gitRoot })
-      await execa('git', ['worktree', 'add', worktreePath, `origin/${branchName}`], { cwd: gitRoot })
+      await execa('git', ['worktree', 'add', worktreePath, `origin/${branchName}`], {
+        cwd: gitRoot,
+      })
       return
     } catch {
       // Create new branch
@@ -34,7 +38,7 @@ export async function createWorktree(
       return
     }
   }
-  
+
   // Branch exists locally
   await execa('git', ['worktree', 'add', worktreePath, branchName], { cwd: gitRoot })
 }
@@ -42,12 +46,12 @@ export async function createWorktree(
 export async function listWorktrees(gitRoot: string): Promise<Worktree[]> {
   try {
     const { stdout } = await execa('git', ['worktree', 'list', '--porcelain'], { cwd: gitRoot })
-    
+
     const worktrees: Worktree[] = []
     const lines = stdout.split('\n')
-    
+
     let currentWorktree: Partial<Worktree> = {}
-    
+
     for (const line of lines) {
       if (line.startsWith('worktree ')) {
         if (currentWorktree.path) {
@@ -70,15 +74,15 @@ export async function listWorktrees(gitRoot: string): Promise<Worktree[]> {
         }
       }
     }
-    
+
     if (currentWorktree.path) {
       worktrees.push(currentWorktree as Worktree)
     }
-    
+
     // Check if branches are pushed to remote
     for (const worktree of worktrees) {
       if (!worktree.branch || worktree.isMain) continue
-      
+
       try {
         await execa('git', ['rev-parse', `origin/${worktree.branch}`], { cwd: gitRoot })
         worktree.isPushed = true
@@ -86,7 +90,7 @@ export async function listWorktrees(gitRoot: string): Promise<Worktree[]> {
         worktree.isPushed = false
       }
     }
-    
+
     return worktrees
   } catch (error) {
     console.error('Error listing worktrees:', error)
@@ -100,7 +104,9 @@ export async function removeWorktree(worktreePath: string, gitRoot: string): Pro
 
 export async function getAllBranches(gitRoot: string): Promise<string[]> {
   try {
-    const { stdout } = await execa('git', ['branch', '-a', '--format=%(refname:short)'], { cwd: gitRoot })
+    const { stdout } = await execa('git', ['branch', '-a', '--format=%(refname:short)'], {
+      cwd: gitRoot,
+    })
     return stdout.split('\n').filter(Boolean)
   } catch {
     return []

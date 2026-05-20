@@ -1,14 +1,22 @@
 #!/usr/bin/env node
+import { readFileSync } from 'node:fs'
 import { program } from 'commander'
+import { configCommand } from './commands/config.js'
+import { createCommand } from './commands/create.js'
+import { initCommand } from './commands/init.js'
+import { listCommand } from './commands/list.js'
 import { getGitRoot, isGitRepo } from './config/detector.js'
 import { configManager } from './config/manager.js'
-import { createCommand } from './commands/create.js'
-import { listCommand } from './commands/list.js'
-import { initCommand } from './commands/init.js'
-import { configCommand } from './commands/config.js'
 
-async function main() {
-  // Check if we're in a git repository
+function getPackageVersion(): string {
+  const packageJson = JSON.parse(
+    readFileSync(new URL('../package.json', import.meta.url), 'utf8'),
+  ) as { version: string }
+
+  return packageJson.version
+}
+
+async function getGitRootOrExit(): Promise<string> {
   if (!(await isGitRepo())) {
     console.error('Error: Not in a git repository')
     process.exit(1)
@@ -20,18 +28,22 @@ async function main() {
     process.exit(1)
   }
 
-  // Load config
   await configManager.load()
+  return gitRoot
+}
 
+async function main() {
   program
     .name('worktree')
     .description('CLI tool for managing Git worktrees across multiple repositories')
-    .version('1.0.0')
+    .version(getPackageVersion())
 
   program
     .argument('[branch]', 'Branch name to create worktree for')
     .description('Create a new worktree or manage existing ones')
     .action(async (branch?: string) => {
+      const gitRoot = await getGitRootOrExit()
+
       if (branch) {
         // Create worktree
         await createCommand(branch, gitRoot)
@@ -45,6 +57,7 @@ async function main() {
     .command('list')
     .description('List and manage worktrees across all configured repositories')
     .action(async () => {
+      const gitRoot = await getGitRootOrExit()
       await listCommand(gitRoot)
     })
 
@@ -52,6 +65,7 @@ async function main() {
     .command('init')
     .description('Initialize configuration for current repository')
     .action(async () => {
+      const gitRoot = await getGitRootOrExit()
       await initCommand(gitRoot)
     })
 
@@ -59,6 +73,7 @@ async function main() {
     .command('config')
     .description('Manage worktree configuration')
     .action(async () => {
+      const gitRoot = await getGitRootOrExit()
       await configCommand(gitRoot)
     })
 

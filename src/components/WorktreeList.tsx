@@ -1,6 +1,6 @@
+import { Box, Text, useApp, useInput } from 'ink'
 import { useState } from 'react'
-import { Box, Text, useInput, useApp } from 'ink'
-import { Worktree } from '../utils/git.js'
+import type { Worktree } from '../utils/git.js'
 
 interface WorktreeListProps {
   worktrees: Worktree[]
@@ -66,22 +66,20 @@ export function WorktreeList({ worktrees, repoName, repoPath, onDelete }: Worktr
             <Text color={index === selectedIndex ? 'cyan' : 'white'}>
               {worktree.branch || 'detached'}
             </Text>
-            {worktree.isPushed && (
-              <Text color="green"> ✓ remote</Text>
-            )}
+            {worktree.isPushed && <Text color="green"> ✓ remote</Text>}
             {worktree.hasPR && (
-              <Text color="magenta"> 🔀 PR #{worktree.prNumber}</Text>
+              <Text color={worktree.isPRMerged ? 'green' : 'magenta'}>
+                {' '}
+                🔀 PR #{worktree.prNumber}
+                {worktree.isPRMerged ? ' (Merged)' : ''}
+              </Text>
             )}
-            {!worktree.isPushed && (
-              <Text color="yellow"> ⚠️ local only</Text>
-            )}
+            {!worktree.isPushed && <Text color="yellow"> ⚠️ local only</Text>}
           </Box>
         ))}
       </Box>
       <Box marginTop={1}>
-        <Text dimColor>
-          [Space] Select  [Enter] Delete Selected ({checkedItems.size})  [Q] Quit
-        </Text>
+        <Text dimColor>[Space] Select [Enter] Delete Selected ({checkedItems.size}) [Q] Quit</Text>
       </Box>
     </Box>
   )

@@ -1,27 +1,32 @@
-import { useState } from 'react'
-import { render, Box, Text } from 'ink'
 import chalk from 'chalk'
-import { configManager } from '../config/manager.js'
-import { listWorktrees, removeWorktree } from '../utils/git.js'
-import { enrichWorktreesWithPRInfo } from '../utils/gh.js'
+import { Box, Text, render } from 'ink'
+import { useState } from 'react'
 import { WorktreeList } from '../components/WorktreeList.js'
+import { configManager } from '../config/manager.js'
+import { enrichWorktreesWithPRInfo, isGhInstalled } from '../utils/gh.js'
+import { type Worktree, listWorktrees, removeWorktree } from '../utils/git.js'
 
 interface RepoWorktrees {
   repoPath: string
   repoName: string
-  worktrees: any[]
+  worktrees: Worktree[]
 }
 
-function ListApp({ repos }: { repos: RepoWorktrees[] }) {
+function ListApp({
+  repos,
+  prInfoUnavailable,
+}: { repos: RepoWorktrees[]; prInfoUnavailable: boolean }) {
   const [currentRepoIndex] = useState(0)
   const [isDeleting, setIsDeleting] = useState(false)
 
   const handleDelete = async (paths: string[]) => {
     setIsDeleting(true)
     const currentRepo = repos[currentRepoIndex]
-    
-    console.log(chalk.yellow(`\n🗑️  Deleting ${paths.length} worktree${paths.length > 1 ? 's' : ''}...`))
-    
+
+    console.log(
+      chalk.yellow(`\n🗑️  Deleting ${paths.length} worktree${paths.length > 1 ? 's' : ''}...`),
+    )
+
     let successCount = 0
     for (const path of paths) {
       try {
@@ -32,12 +37,16 @@ function ListApp({ repos }: { repos: RepoWorktrees[] }) {
         console.error(chalk.red(`  ✗ Failed to remove ${path}: ${error}`))
       }
     }
-    
+
     if (successCount > 0) {
-      console.log(chalk.cyan(`\n✅ Successfully deleted ${successCount} worktree${successCount > 1 ? 's' : ''}!`))
-      console.log(chalk.gray(`💪 Workspace cleaned up and ready to go!`))
+      console.log(
+        chalk.cyan(
+          `\n✅ Successfully deleted ${successCount} worktree${successCount > 1 ? 's' : ''}!`,
+        ),
+      )
+      console.log(chalk.gray('💪 Workspace cleaned up and ready to go!'))
     }
-    
+
     // Refresh the list after deletion
     setTimeout(() => process.exit(0), 1500)
   }
@@ -60,6 +69,11 @@ function ListApp({ repos }: { repos: RepoWorktrees[] }) {
 
   return (
     <Box flexDirection="column">
+      {prInfoUnavailable && (
+        <Box marginBottom={1}>
+          <Text color="yellow">Unable to load PR info, please install GitHub CLI</Text>
+        </Box>
+      )}
       {repos.map((repo) => (
         <WorktreeList
           key={repo.repoPath}
@@ -76,12 +90,15 @@ function ListApp({ repos }: { repos: RepoWorktrees[] }) {
 export async function listCommand(currentGitRoot: string): Promise<void> {
   const allRepoConfigs = await configManager.getAllRepoConfigs()
   const repos: RepoWorktrees[] = []
+  const canLoadPRInfo = await isGhInstalled()
 
   // Add current repo first if configured
   const currentRepoConfig = allRepoConfigs[currentGitRoot]
   if (currentRepoConfig) {
     const worktrees = await listWorktrees(currentGitRoot)
-    await enrichWorktreesWithPRInfo(worktrees, currentGitRoot)
+    if (canLoadPRInfo) {
+      await enrichWorktreesWithPRInfo(worktrees, currentGitRoot)
+    }
     repos.push({
       repoPath: currentGitRoot,
       repoName: currentRepoConfig.name,
@@ -92,16 +109,18 @@ export async function listCommand(currentGitRoot: string): Promise<void> {
   // Add other configured repos
   for (const [repoPath, config] of Object.entries(allRepoConfigs)) {
     if (repoPath === currentGitRoot) continue
-    
+
     try {
       const worktrees = await listWorktrees(repoPath)
-      await enrichWorktreesWithPRInfo(worktrees, repoPath)
+      if (canLoadPRInfo) {
+        await enrichWorktreesWithPRInfo(worktrees, repoPath)
+      }
       repos.push({
         repoPath,
         repoName: config.name,
         worktrees,
       })
-    } catch (error) {
+    } catch {
       // Skip repos that might have been deleted or are inaccessible
       console.warn(chalk.yellow(`Warning: Could not access ${config.name} at ${repoPath}`))
     }
@@ -114,5 +133,5 @@ export async function listCommand(currentGitRoot: string): Promise<void> {
     return
   }
 
-  render(<ListApp repos={repos} />)
+  render(<ListApp repos={repos} prInfoUnavailable={!canLoadPRInfo} />)
 }
