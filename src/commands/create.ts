@@ -5,7 +5,7 @@ import { execa } from 'execa'
 import fs from 'fs-extra'
 import ora from 'ora'
 import { configManager } from '../config/manager.js'
-import { createWorktree } from '../utils/git.js'
+import { createWorktree, setupSubmodulesForBranch } from '../utils/git.js'
 import { createWorktreeName } from '../utils/sanitize.js'
 import { initCommand } from './init.js'
 
@@ -135,6 +135,16 @@ export async function createCommand(branch: string, gitRoot: string): Promise<vo
     spinner.start('Creating worktree...')
     await createWorktree(config.basePath, worktreeName, branch, gitRoot)
     spinner.succeed('Worktree created')
+
+    spinner.start('Setting up submodules...')
+    const submodulePaths = await setupSubmodulesForBranch(worktreePath, branch)
+    if (submodulePaths.length > 0) {
+      spinner.succeed(
+        `Set up ${submodulePaths.length} submodule${submodulePaths.length === 1 ? '' : 's'}`,
+      )
+    } else {
+      spinner.info('No submodules found')
+    }
 
     // Copy .env file if configured
     if (config.envPath) {
