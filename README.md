@@ -1,6 +1,6 @@
 # 🌳 Worktree CLI
 
-> **Transform your Git workflow with blazing-fast worktree management across multiple repositories** ⚡
+> **Transform your Git workflow with blazing-fast, repository-local worktree management** ⚡
 
 [![npm version](https://img.shields.io/npm/v/@mcadam/worktree.svg)](https://www.npmjs.com/package/@mcadam/worktree)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -97,7 +97,11 @@ Watch the magic happen:
 ### 3️⃣ Manage Your Worktrees
 
 ```bash
+worktree
+# Shows worktrees for the current repository
+
 worktree list
+# Also shows worktrees for the current repository
 ```
 
 Interactive UI shows all your worktrees:
@@ -127,7 +131,7 @@ worktree feature/awesome-stuff
 
 ### `worktree list` - See Everything 👀
 
-Beautiful interactive list of all worktrees across all repositories:
+Beautiful interactive list of worktrees for the current repository:
 - **Space** - Select worktrees
 - **Enter** - Delete selected
 - **Q** - Quit
@@ -185,9 +189,13 @@ worktree feature/user-dashboard-api
 cd ~/projects/mobile
 worktree feature/user-dashboard-mobile
 
-# See all your work
+# See the frontend worktrees
+cd ~/projects/frontend
 worktree list
-# Shows all 3 worktrees across all repos! 🎉
+
+# Switch repositories to see their worktrees
+cd ~/projects/backend
+worktree list
 ```
 
 ### The Quick Fix Master

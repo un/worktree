@@ -35,7 +35,7 @@ async function getGitRootOrExit(): Promise<string> {
 async function main() {
   program
     .name('worktree')
-    .description('CLI tool for managing Git worktrees across multiple repositories')
+    .description('CLI tool for managing Git worktrees for the current repository')
     .version(getPackageVersion())
 
   program
@@ -48,14 +48,14 @@ async function main() {
         // Create worktree
         await createCommand(branch, gitRoot)
       } else {
-        // Show list if no branch provided
+        // Show only the current repository if no branch is provided
         await listCommand(gitRoot)
       }
     })
 
   program
     .command('list')
-    .description('List and manage worktrees across all configured repositories')
+    .description('List and manage worktrees for the current repository')
     .action(async () => {
       const gitRoot = await getGitRootOrExit()
       await listCommand(gitRoot)

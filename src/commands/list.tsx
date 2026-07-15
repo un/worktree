@@ -12,6 +12,13 @@ interface RepoWorktrees {
   worktrees: Worktree[]
 }
 
+export function getRepoPathsToList(
+  allRepoConfigs: Awaited<ReturnType<typeof configManager.getAllRepoConfigs>>,
+  currentGitRoot: string,
+): string[] {
+  return allRepoConfigs[currentGitRoot] ? [currentGitRoot] : []
+}
+
 function ListApp({
   repos,
   prInfoUnavailable,
@@ -92,23 +99,10 @@ export async function listCommand(currentGitRoot: string): Promise<void> {
   const repos: RepoWorktrees[] = []
   const canLoadPRInfo = await isGhInstalled()
 
-  // Add current repo first if configured
-  const currentRepoConfig = allRepoConfigs[currentGitRoot]
-  if (currentRepoConfig) {
-    const worktrees = await listWorktrees(currentGitRoot)
-    if (canLoadPRInfo) {
-      await enrichWorktreesWithPRInfo(worktrees, currentGitRoot)
-    }
-    repos.push({
-      repoPath: currentGitRoot,
-      repoName: currentRepoConfig.name,
-      worktrees,
-    })
-  }
+  const repoPaths = getRepoPathsToList(allRepoConfigs, currentGitRoot)
 
-  // Add other configured repos
-  for (const [repoPath, config] of Object.entries(allRepoConfigs)) {
-    if (repoPath === currentGitRoot) continue
+  for (const repoPath of repoPaths) {
+    const config = allRepoConfigs[repoPath]
 
     try {
       const worktrees = await listWorktrees(repoPath)
